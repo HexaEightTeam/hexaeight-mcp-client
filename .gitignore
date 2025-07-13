@@ -50,3 +50,17 @@ Thumbs.db
 # Package building
 dist/
 build/
+
+# Package building
+build/
+dist/
+*.egg-info/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local testing
+test_install/
+venv_test/
