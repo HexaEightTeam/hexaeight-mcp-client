@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hexaeight-mcp-client"
-version = "0.1.0"
+version = "1.6.8"
 description = "Framework-agnostic MCP client integration for HexaEight agents"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -26,7 +26,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
-    "hexaeight-agent>=1.0.0",
+    "hexaeight-agent>=1.6.807",
 ]
 
 [project.optional-dependencies]
