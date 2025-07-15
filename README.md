@@ -537,8 +537,8 @@ A: Check that your CLIENT Application is properly configured and PubSub server i
 ## 🔗 Links & Resources
 
 - **🏪 HexaEight Store**: [store.hexaeight.com](https://store.hexaeight.com) - Purchase licenses
-- **📖 Documentation**: [GitHub Repository](https://github.com/hexaeight/mcp-client)
-- **🐛 Issues**: [GitHub Issues](https://github.com/hexaeight/mcp-client/issues)
+- **📖 Documentation**: [GitHub Repository](https://github.com/hexaeight/hexaeight-mcp-client)
+- **🐛 Issues**: [GitHub Issues](https://github.com/hexaeight/hexaeight-mcp-client/issues)
 - **📦 HexaEight Agent**: [hexaeight-agent on PyPI](https://pypi.org/project/hexaeight-agent/)
 - **💬 Support**: Contact support for licensing and technical issues
 
