@@ -3,7 +3,7 @@ Enhanced HexaEight MCP Client
 Framework-agnostic MCP integration for HexaEight agents with full coordination capabilities
 """
 
-__version__ = "1.0.0"
+__version__ = "1.6.803"
 __author__ = "HexaEight"
 __license__ = "MIT"
 
@@ -68,6 +68,15 @@ from .exceptions import (
     TaskCoordinationError
 )
 
+# CLI tools exports
+from .cli.main import (
+    hexaeight_start,
+    hexaeight_check, 
+    hexaeight_create,
+    hexaeight_deploy,
+    hexaeight_setup
+)
+
 # All exports for external use
 __all__ = [
     # Core classes
@@ -112,6 +121,15 @@ __all__ = [
     "quick_langchain_llm",
     "quick_tool_agent",
     "quick_user_agent",
+    
+    # CLI tools
+    "hexaeight_start",
+    "hexaeight_check",
+    "hexaeight_create", 
+    "hexaeight_deploy",
+    "get_cli_commands",
+    "print_cli_help",
+    "hexaeight_setup",
     
     # Exceptions
     "HexaEightMCPError",
@@ -189,6 +207,34 @@ def print_package_info():
     print(f"  ")
     print(f"  # User Agent")
     print(f"  user = await quick_user_agent('user_config.json')")
+
+# CLI information functions
+def get_cli_commands():
+    """Get available CLI commands"""
+    return {
+        "hexaeight-start": "Start HexaEight services (license-activation, generate-agents)",
+        "hexaeight-check": "Check prerequisites and system requirements", 
+        "hexaeight-create": "Create project directories with license hardlinks",
+        "hexaeight-deploy": "Deploy sample multi-agent systems",
+        "hexaeight-setup": "Setup portable child agent environments"
+    }
+
+def print_cli_help():
+    """Print CLI help information"""
+    print(f"🔧 HexaEight MCP Client v{__version__} - CLI Tools")
+    print("=" * 60)
+    
+    commands = get_cli_commands()
+    for command, description in commands.items():
+        print(f"  {command.ljust(20)}: {description}")
+    
+    print(f"\nExamples:")
+    print(f"  hexaeight-start license-activation")
+    print(f"  hexaeight-check check-prerequisites")
+    print(f"  hexaeight-create directory-linked-to-hexaeight-license my-project")
+    print(f"  hexaeight-deploy multi-ai-agent-samples")
+    print(f"  hexaeight-setup portable-child-agent-environment child_config.json")  # NEW LINE
+    print(f"\nFor more information: https://github.com/HexaEightTeam/hexaeight-mcp-client")
 
 # Configuration validation helpers
 def validate_agent_type(agent_type: str) -> bool:

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hexaeight-mcp-client"
-version = "1.6.802"
+version = "1.6.803"
 description = "Framework-agnostic MCP client integration for HexaEight agents"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -26,7 +26,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
-    "hexaeight-agent>=1.6.807",
+    "hexaeight-agent>=1.6.808",
 ]
 
 [project.optional-dependencies]
@@ -53,8 +53,21 @@ Documentation = "https://github.com/HexaEightTeam/hexaeight-mcp-client/blob/main
 Repository = "https://github.com/HexaEightTeam/hexaeight-mcp-client.git"
 Issues = "https://github.com/HexaEightTeam/hexaeight-mcp-client/issues"
 
+# NEW: Console script entry points
+[project.scripts]
+hexaeight-start = "hexaeight_mcp_client.cli.main:hexaeight_start"
+hexaeight-check = "hexaeight_mcp_client.cli.main:hexaeight_check"
+hexaeight-create = "hexaeight_mcp_client.cli.main:hexaeight_create"
+hexaeight-deploy = "hexaeight_mcp_client.cli.main:hexaeight_deploy"
+hexaeight-setup = "hexaeight_mcp_client.cli.main:hexaeight_setup"  # NEW LINE
+
 [tool.setuptools.packages.find]
 include = ["hexaeight_mcp_client*"]
 
+# NEW: Include binary files and templates
 [tool.setuptools.package-data]
-hexaeight_mcp_client = ["py.typed"]
+hexaeight_mcp_client = [
+    "py.typed",
+    "bin/*.zip",
+    "templates/**/*"
+]

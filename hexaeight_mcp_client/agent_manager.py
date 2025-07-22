@@ -7,7 +7,7 @@ import subprocess
 import asyncio
 import logging
 import json
-from typing import Dict, List, Optional, Tuple, Union, Literal
+from typing import Dict, List, Optional, Tuple, Union, Literal, Any
 from dataclasses import dataclass
 
 try:
@@ -771,4 +771,4 @@ class LegacyAgentCreator:
         """Create child agent using dotnet script"""
         # Implementation for backward compatibility with existing dotnet scripts
         # This can be implemented if needed for specific use cases
-        pass"""
+        pass
