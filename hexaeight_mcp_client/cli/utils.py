@@ -11,7 +11,13 @@ import shutil
 import json
 from pathlib import Path
 from typing import Optional, Dict, Any, List, Tuple
-import pkg_resources
+
+# FIXED: Use modern importlib.resources instead of deprecated pkg_resources
+try:
+    from importlib import resources
+except ImportError:
+    # Fallback for Python < 3.9
+    import importlib_resources as resources
 
 def get_platform_info() -> Tuple[str, str]:
     """Get platform information for selecting correct binary"""
@@ -38,9 +44,13 @@ def extract_machine_token_utility() -> str:
     print(f"📦 Extracting machine token utility for {platform_name}...")
     
     try:
-        # Get the zip file from package resources
+        # FIXED: Use modern importlib.resources instead of pkg_resources
         zip_filename = f"{platform_name}.zip"
-        zip_data = pkg_resources.resource_string('hexaeight_mcp_client', f'bin/{zip_filename}')
+        
+        # Get the zip file from package resources using modern API
+        import hexaeight_mcp_client
+        with resources.files(hexaeight_mcp_client).joinpath(f'bin/{zip_filename}').open('rb') as zip_file:
+            zip_data = zip_file.read()
         
         # Write zip to temp file and extract
         temp_zip = f"temp_{zip_filename}"
@@ -54,7 +64,7 @@ def extract_machine_token_utility() -> str:
         # Clean up temp zip
         os.remove(temp_zip)
         
-        # NEW: Move files from subdirectory to current directory
+        # Move files from subdirectory to current directory
         extracted_dir = os.path.join('.', platform_name)
         if os.path.exists(extracted_dir):
             print(f"📁 Moving files from {extracted_dir}/ to current directory...")
@@ -134,7 +144,10 @@ def create_hardlink(source: str, destination: str) -> bool:
 def get_template_content(template_path: str) -> str:
     """Get content from package template"""
     try:
-        return pkg_resources.resource_string('hexaeight_mcp_client', f'templates/{template_path}').decode('utf-8')
+        # FIXED: Use modern importlib.resources instead of pkg_resources
+        import hexaeight_mcp_client
+        with resources.files(hexaeight_mcp_client).joinpath(f'templates/{template_path}').open('r', encoding='utf-8') as template_file:
+            return template_file.read()
     except Exception as e:
         raise Exception(f"Failed to read template {template_path}: {e}")
 

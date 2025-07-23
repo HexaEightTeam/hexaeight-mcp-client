@@ -7,7 +7,14 @@ import json
 import subprocess
 import asyncio
 from typing import List, Dict, Optional
-import pkg_resources
+
+# FIXED: Use modern importlib.resources instead of deprecated pkg_resources
+try:
+    from importlib import resources
+except ImportError:
+    # Fallback for Python < 3.9
+    import importlib_resources as resources
+
 from .utils import (
     print_section, 
     confirm_action,
@@ -359,11 +366,21 @@ class PortableSetupCLI:
         """Copy hexaeight_demo.py from package"""
         
         try:
-            # Get demo script from hexaeight_agent package
-            demo_content = pkg_resources.resource_string(
-                'hexaeight_agent', 
-                'demo/hexaeight_demo.py'
-            ).decode('utf-8')
+            # FIXED: Use modern importlib.resources instead of pkg_resources
+            import hexaeight_agent
+            
+            try:
+                # Try modern approach first
+                with resources.files(hexaeight_agent).joinpath('demo/hexaeight_demo.py').open('r', encoding='utf-8') as demo_script:
+                    demo_content = demo_script.read()
+            except (AttributeError, FileNotFoundError):
+                # Fallback for older package structure or different path
+                try:
+                    with resources.files(hexaeight_agent).joinpath('hexaeight_demo.py').open('r', encoding='utf-8') as demo_script:
+                        demo_content = demo_script.read()
+                except (AttributeError, FileNotFoundError):
+                    # Last resort: check if available in package root
+                    demo_content = resources.files(hexaeight_agent).joinpath('demo.py').read_text(encoding='utf-8')
             
             with open(demo_file, 'w') as f:
                 f.write(demo_content)

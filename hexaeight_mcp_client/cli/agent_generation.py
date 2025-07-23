@@ -109,16 +109,17 @@ class AgentGenerationCLI:
                 print(f"❌ Scripts directory not found: {scripts_path}")
                 return None
             
-            # Copy scripts to current directory
+            # Copy scripts to current directory (FIXED: automatic overwrite)
             script_files = []
             for filename in os.listdir(scripts_path):
                 if filename.endswith('.csx'):
                     source = os.path.join(scripts_path, filename)
                     dest = os.path.join('.', filename)
                     
+                    # FIXED: Remove existing file without prompting
                     if os.path.exists(dest):
-                        if not confirm_action(f"Override existing {filename}?"):
-                            continue
+                        os.remove(dest)
+                        print(f"🔄 Overwriting existing {filename}")
                     
                     with open(source, 'r') as src_file:
                         content = src_file.read()
@@ -222,31 +223,29 @@ class AgentGenerationCLI:
                 "dotnet", "script", 
                 "create-identity-for-parent-agent.csx",
                 config_filename,
-                "--show-logs",
                 "--no-cache"
             ]
             
             print(f"📋 Running: {' '.join(cmd)}")
+            print(f"=" * 60)
             
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            # Run interactively without capturing output
+            result = subprocess.run(cmd, check=False)
+            
+            print(f"=" * 60)
             
             if result.returncode == 0:
                 print(f"✅ Parent agent created successfully!")
                 print(f"📄 Configuration file: {config_filename}")
-                
-                if result.stdout:
-                    print(f"\n📋 Output:")
-                    print(result.stdout)
-                
                 return True
             else:
-                print(f"❌ Parent agent generation failed")
-                if result.stderr:
-                    print(f"Error: {result.stderr}")
-                if result.stdout:
-                    print(f"Output: {result.stdout}")
+                print(f"❌ Parent agent generation failed (exit code: {result.returncode})")
+                print(f"💡 Check the output above for error details")
                 return False
                 
+        except KeyboardInterrupt:
+            print(f"\n👋 Parent agent generation cancelled by user")
+            return False
         except Exception as e:
             print(f"❌ Error generating parent agent: {e}")
             return False
@@ -301,6 +300,7 @@ class AgentGenerationCLI:
         
         try:
             print(f"\n🚀 Generating child agent...")
+            print(f"⚠️  NOTE: You will be prompted to enter a password for the child agent")
             
             cmd = [
                 "dotnet", "script",
@@ -311,50 +311,25 @@ class AgentGenerationCLI:
             ]
             
             print(f"📋 Running: {' '.join(cmd)}")
+            print(f"=" * 60)
             
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            # Run interactively without capturing output
+            result = subprocess.run(cmd, check=False)
+            
+            print(f"=" * 60)
             
             if result.returncode == 0:
                 print(f"✅ Child agent created successfully!")
-                
-                # Extract password from output
-                password = self._extract_password_from_output(result.stdout)
-                if password:
-                    print(f"🔑 Child agent password: {password}")
-                    print(f"💾 Save this password - you'll need it to run the child agent")
-                
-                if result.stdout:
-                    print(f"\n📋 Output:")
-                    print(result.stdout)
-                
+                print(f"🔑 IMPORTANT: Save the password displayed above - you'll need it to run the child agent")
                 return True
             else:
-                print(f"❌ Child agent generation failed")
-                if result.stderr:
-                    print(f"Error: {result.stderr}")
-                if result.stdout:
-                    print(f"Output: {result.stdout}")
+                print(f"❌ Child agent generation failed (exit code: {result.returncode})")
+                print(f"💡 Check the output above for error details")
                 return False
                 
+        except KeyboardInterrupt:
+            print(f"\n👋 Child agent generation cancelled by user")
+            return False
         except Exception as e:
             print(f"❌ Error generating child agent: {e}")
             return False
-    
-    def _extract_password_from_output(self, output: str) -> str:
-        """Extract child agent password from script output"""
-        
-        lines = output.split('\n')
-        for line in lines:
-            line = line.strip()
-            if 'password' in line.lower() and ('=' in line or ':' in line):
-                # Try to extract password
-                if '=' in line:
-                    parts = line.split('=')
-                    if len(parts) > 1:
-                        return parts[1].strip().strip('"\'')
-                elif ':' in line:
-                    parts = line.split(':')
-                    if len(parts) > 1:
-                        return parts[1].strip().strip('"\'')
-        
-        return None
