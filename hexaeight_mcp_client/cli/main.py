@@ -152,11 +152,10 @@ KEY CONCEPTS QUICK REFERENCE:
     ⚡ 2-Min Setup:    Download app → create resource → activate license
 
 MORE INFO:
-    📖 Documentation: https://github.com/HexaEightTeam/hexaeight-mcp-client
+    📖 Github : https://github.com/HexaEightTeam/hexaeight-mcp-client
     🛒 License Store:  https://store.hexaeight.com
     📱 Mobile App:     Search "HexaEight Authenticator" in app stores
 
-NOTE: Clean, focused interface - concepts separated from activation process!
 """)
 
 # Enhanced help function for the main package

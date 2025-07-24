@@ -1,231 +1,443 @@
 """
-HexaEight Concepts Presentation CLI
-Show educational slides about HexaEight AI Agent concepts
+HexaEight Concepts Presentation CLI - Clean UI without border lines
 """
 
+import os
+import sys
 import time
-from typing import List
-from .utils import print_section, confirm_action
+import shutil
+from typing import List, Tuple
+from .utils import confirm_action
 
 class ConceptsPresentationCLI:
-    """CLI for showing HexaEight concepts presentation"""
+    """CLI for showing HexaEight concepts presentation with clean UI"""
     
+    def __init__(self):
+        self.width, self.height = self._get_terminal_size()
+        self.content_width = min(80, self.width - 4)
+        
     def run(self, args: List[str]) -> None:
-        """Run concepts presentation"""
+        """Run concepts presentation with clean UI"""
         
-        print_section(
-            "HexaEight AI Agent Concepts",
-            "Educational presentation about enterprise AI agents"
-        )
-        
-        # Check if user wants interactive mode
+        # Check modes
         interactive = len(args) == 0 or "--interactive" in args
         auto_advance = "--auto" in args
         
+        # Welcome screen
+        self._show_welcome_screen(interactive, auto_advance)
+        
         if interactive and not auto_advance:
-            print("🎯 Press Enter to advance slides, 'q' to quit, 's' to skip to end")
-            print()
+            input("\nPress Enter to start presentation...")
+        else:
+            time.sleep(2)
         
         slides = self._get_slides()
         
         for i, (title, content) in enumerate(slides, 1):
-            print_section(f"Slide {i}: {title}")
-            print(content)
-            print(f"\n{'─' * 60}")
-            print(f"Slide {i} of {len(slides)}")
+            self._show_slide(i, len(slides), title, content)
             
             if interactive and not auto_advance:
-                user_input = input("\nPress Enter for next slide (or 'q' to quit, 's' to skip): ").strip().lower()
+                print()
+                controls = "Press Enter for next • 'q' to quit • 's' to skip • 'b' for back"
+                print(self._center_text(controls))
+                
+                user_input = input().strip().lower()
                 if user_input == 'q':
-                    print("👋 Presentation ended")
+                    self._show_goodbye_screen()
                     return
                 elif user_input == 's':
                     break
-                print()
+                elif user_input == 'b' and i > 1:
+                    i -= 2
+                    continue
             elif auto_advance:
-                time.sleep(3)  # Auto-advance after 3 seconds
-            else:
-                print("\n" + "="*60 + "\n")
+                time.sleep(4)
         
-        # Show completion message
-        print_section("🎉 Concepts Presentation Complete!")
-        print("🚀 Ready to start building your AI agent infrastructure?")
-        print()
-        print("Next steps:")
-        print("   hexaeight-start license-activation")
-        print("   hexaeight-start create-directory-linked-to-hexaeight-license my-project")
+        self._show_completion_screen()
     
-    def _get_slides(self) -> List[tuple]:
+    def _get_terminal_size(self) -> Tuple[int, int]:
+        """Get terminal dimensions"""
+        try:
+            size = shutil.get_terminal_size()
+            return size.columns, size.lines
+        except:
+            return 80, 24
+    
+    def _clear_screen(self):
+        """Clear the screen"""
+        os.system('cls' if os.name == 'nt' else 'clear')
+    
+    def _center_text(self, text: str) -> str:
+        """Center text horizontally"""
+        return text.center(self.width)
+    
+    def _print_centered_content(self, content: str, indent: int = 0):
+        """Print content centered with proper formatting"""
+        lines = content.strip().split('\n')
+        
+        for line in lines:
+            if line.strip():
+                # Add indent for content
+                spaced_line = (" " * indent) + line
+                print(self._center_text(spaced_line))
+            else:
+                print()
+    
+    def _show_slide(self, slide_num: int, total_slides: int, title: str, content: str):
+        """Show a single slide with clean formatting"""
+        self._clear_screen()
+        
+        # Add vertical padding
+        vertical_padding = max(3, (self.height - 15) // 2)
+        for _ in range(vertical_padding):
+            print()
+        
+        # Progress indicator
+        progress_bar = self._create_progress_bar(slide_num, total_slides)
+        print(self._center_text(progress_bar))
+        print()
+        print()
+        
+        # Title with decoration
+        title_line = f"🚀 {title} 🚀"
+        print(self._center_text(title_line))
+        print(self._center_text("=" * len(title_line)))
+        print()
+        print()
+        
+        # Content with slight indent for readability
+        self._print_centered_content(content, indent=2)
+        
+        # Bottom spacing and slide info
+        print()
+        print()
+        slide_info = f"Slide {slide_num} of {total_slides}"
+        print(self._center_text("─" * len(slide_info)))
+        print(self._center_text(slide_info))
+    
+    def _create_progress_bar(self, current: int, total: int) -> str:
+        """Create a visual progress bar"""
+        bar_width = 30
+        filled = int((current / total) * bar_width)
+        bar = "█" * filled + "░" * (bar_width - filled)
+        percentage = int((current / total) * 100)
+        return f"Progress: [{bar}] {percentage}%"
+    
+    def _show_welcome_screen(self, interactive: bool, auto_advance: bool):
+        """Show welcome screen"""
+        self._clear_screen()
+        
+        # Center vertically
+        for _ in range(self.height // 3):
+            print()
+        
+        print(self._center_text("🚀 HexaEight AI Agent Concepts 🚀"))
+        print()
+        print(self._center_text("Interactive Educational Presentation"))
+        print()
+        print(self._center_text("Transform Your Business with Enterprise AI Agents"))
+        print()
+        print(self._center_text("=" * 60))
+        print()
+        
+        if interactive and not auto_advance:
+            controls_text = "🎯 Interactive Mode: Navigate with Enter, 'q' to quit, 's' to skip, 'b' to go back"
+        elif auto_advance:
+            controls_text = "⚡ Auto-Advance Mode: Slides change automatically every 4 seconds"
+        else:
+            controls_text = "📖 Reading Mode: All slides will be displayed"
+        
+        print(self._center_text(controls_text))
+    
+    def _show_completion_screen(self):
+        """Show completion screen"""
+        self._clear_screen()
+        
+        for _ in range(self.height // 3):
+            print()
+        
+        print(self._center_text("🎉 Concepts Presentation Complete! 🎉"))
+        print()
+        print(self._center_text("Ready to Build Your AI Agent Infrastructure?"))
+        print()
+        print()
+        print(self._center_text("Next Steps:"))
+        print(self._center_text("• hexaeight-start license-activation"))
+        print(self._center_text("• hexaeight-start create-directory-linked-to-hexaeight-license my-project"))
+        print(self._center_text("• hexaeight-start generate-parent-or-child-agent-licenses"))
+        print()
+        print()
+        print(self._center_text("Press Enter to continue..."))
+        input()
+    
+    def _show_goodbye_screen(self):
+        """Show goodbye screen"""
+        self._clear_screen()
+        
+        for _ in range(self.height // 2):
+            print()
+        
+        print(self._center_text("👋 Thanks for Learning About HexaEight AI Agents! 👋"))
+        print()
+        print(self._center_text("Ready when you are: hexaeight-start license-activation"))
+        print()
+        
+        time.sleep(2)
+    
+    def _get_slides(self) -> List[Tuple[str, str]]:
         """Get all presentation slides"""
         return [
-            ("Welcome to Enterprise AI Agents 🚀", """
-**Transform Your Business with Professional AI Agents**
+            ("hexaeight-mcp-client Prerequisites", """
+Before Using hexaeight-mcp-client for AI Agent Development
 
-• 🏢 **Enterprise-Grade Security**: Military-grade encryption and identity management
-• 🌍 **Global Deployment**: Deploy anywhere with secure communication
-• ⚡ **Instant Setup**: 2-minute activation with mobile app
-• 💰 **Cost-Effective**: Build permanent AI workforce from temporary license
+You've installed hexaeight-mcp-client Python package.
+Before integrating MCP into AI agents, groundwork is required:
+
+📋 Required Prerequisites :
+
+1. 🏢 HexaEight-Agentic-IAM Server
+   Deploy from Azure Marketplace to create Client Applications
+
+2. 🔑 Client Application 
+   ClientID, Token Server URL, PubSub URL from IAM Server
+
+3. 💻 Machine License
+   Install where your agents will run (NOT on IAM Server)
+   Enables creation of agent configuration files
+
+4. 📄 Agent Configuration Files
+   Identity files for secure agent communication via PubSub
 """),
             
-            ("Revolutionary Identity System 🎯", """
-**Two Identity Options for Every Business Need**
+            ("HexaEight-Agentic-IAM Server Setup", """
+Azure Marketplace Deployment
 
-**Option A: Generic Resources (2 minutes)**
-🎲 Examples: storm23-cloud-wave-bright09, sec45-sensor-gale-glow25
-✅ Instant deployment, no domain required
-📱 Generate via HexaEight Authenticator app
+🏢 HexaEight-Agentic-IAM Server:
+   Available on Azure Marketplace
+   Central identity and application management server
+   Allows creation of unlimited Client Applications
 
-**Option B: Domain Resources (4 minutes)**
-🌐 Examples: weather-agent.yourcompany.com, api-bot.acme.corp
-💼 Professional branding with your domain
-📧 Requires domain email verification
+📋 What it provides:
+• Client Application management interface
+• Token Server URL generation
+• PubSub URL provisioning
+• Agent identity verification
+• Cross-domain communication coordination
+
+🔗 Each Client Application gets:
+• Unique ClientID
+• Token Server URL (for agent authentication)
+• PubSub URL (for agent communication)
+
+⚠️  Note: This is infrastructure setup, not where agents run
 """),
             
-            ("License Architecture 💡", """
-**CPU-Based Pricing Model**
+            ("Client Application Configuration", """
+Getting Your Development Credentials
 
-| CPU Count | 5-Day License | Strategy            |
-|-----------|---------------|---------------------|
-| 1 CPU     | $15          | Perfect for testing |
-| 2 CPU     | $30          | Small business      |
-| 4 CPU     | $59          | Enterprise          |
+After deploying HexaEight-Agentic-IAM Server:
 
-**🎯 Winning Strategy:**
-• Buy minimal CPU license (5 days)
-• Generate unlimited child agents (permanent)
-• Deploy child agents everywhere
-• Child agents work forever!
+🔧 Create Client Application using Option 2 and use Option 6 to show:
+• ClientID
+• Token Server URL
+• PubSub URL
+
+📝 Required Environment Variables:
+   HEXAEIGHT_CLIENT_ID="your_client_id"
+   HEXAEIGHT_TOKENSERVER_URL="https://your-server:8443"
+   HEXAEIGHT_PUBSUB_URL="https://your-server:2083/pubsub/client_id"
+
+✅ Prerequisites Check:
+   hexaeight-start check-prerequisites
+   
+   Verifies all required credentials are configured
 """),
             
-            ("Agent Architecture 🏗️", """
-**Parent Agent (Licensed Machine)**
-👑 Capabilities:
-├── 🏭 Generate unlimited child agents
-├── 📋 Create and delegate complex tasks  
-├── 🌐 Direct cross-domain communication
-└── 🔐 Enterprise security management
+            ("Machine License Requirements", """
+License Installation for Agent Development
 
-**Child Agents (Deployed Anywhere)**
-👥 Characteristics:
-├── ♾️  Never expire (work forever)
-├── 🌍 Deploy anywhere (cloud, edge, IoT)
-├── 🔐 Full encryption capabilities
-└── 💰 Zero ongoing licensing costs
+💻 Install License Where Agents Will Run:
+• Local development machine
+• Cloud servers (AWS, Azure, GCP)
+• Edge devices (Raspberry Pi, IoT)
+• NOT on the HexaEight-Agentic-IAM Server
+
+🔑 License Purpose:
+• Creates parent and child agent configuration files
+• Enables secure agent identity generation
+• Required for agent-to-agent communication setup
+
+📦 How to purchase License:
+   Visit https://store.hexaeight.com
+   Note: Licences are based on number of CPUs
+   1 CPU: $15 (Minimum 5 daysi License)
+
+   If you plan to run Parent Agents permnently you need to purchase monthly licenses
+
+⚡ Activation:
+   hexaeight-start license-activation
 """),
             
-            ("Communication Architecture 🌐", """
-┌─────────────────┐    Direct Secure    ┌─────────────────┐
-│   Parent Agent  │ ←──── Channel ────→ │   Parent Agent  │
-│ (weatherapi.com)│                     │  (hotelapi.com) │
-└─────────────────┘                     └─────────────────┘
-         │                                       │
-         │ Delegates                             │ Delegates
-         ▼                                       ▼
-┌─────────────────┐    PubSub Channel    ┌─────────────────┐
-│   Child Agents  │ ←──── Same App ────→ │   Child Agents  │
-│   (App Bound)   │                      │   (App Bound)   │
-└─────────────────┘                      └─────────────────┘
+            ("Agent Configuration Files", """
+Identity System for Secure Communication
 
-**Key Points:**
-• 🔗 Parent-to-Parent: Direct secure communication across domains
-• 👥 Child-to-Child: PubSub communication within same application
-• 🏢 Enterprise: No application boundaries for parent agents
+📄 Configuration Files = Agent Identities:
+• parent_config.json - Main agent (licensed machine)
+• child_config.json - Distributed agents (any machine)
+
+🔐 What configuration files contain:
+• Agent Identities
+• Internal Agent Identities
+• Asymmetric Shared keysa for communication
+
+🏗️  Agent Creation Process:
+   hexaeight-start generate-parent-or-child-agent-licenses
+   
+   Creates configuration files with secure identities
+   Child agents: Require 32+ character password
+   Parent agents: No password required
+
+✅ Result: Agents can securely communicate via PubSub system
 """),
             
-            ("Strategic Recommendations 🎯", """
-**During License Period (5 days):**
-✅ Create parent agent configuration immediately
-✅ Generate 10-20 child agents (they're permanent!)
-✅ Test multi-agent coordination with samples
-✅ Deploy child agents to target environments
+            ("hexaeight-mcp-client Benefits", """
+Technical Benefits for AI Agent Development
 
-**Post-License Period (Forever):**
-✅ Child agents continue working indefinitely
-✅ Use parent agent for task delegation (while license active)
-✅ Leverage cross-domain communication capabilities
-✅ Scale with additional child agents as needed
+🔧 Framework Integration:
+• AutoGen: Multi-agent conversations with secure identity
+• CrewAI: Role-based agents with encrypted communication
+• LangChain: Chain-based reasoning with secure messaging
+• Generic: Custom framework support
+
+⚡ Developer Benefits:
+• Secure agent-to-agent communication out-of-the-box
+• Built-in message encryption/decryption
+• Cross-domain agent coordination
+• No custom security implementation required
+• No Https Certificates Required
+
+🏗️  MCP Features:
+• Tool sharing between agents
+• Message locking for coordination
+• Capability discovery across agent networks
+• Task delegation and workflow management
+
+🌍 Deployment Flexibility:
+• Agents run anywhere with configuration file
+• No network restrictions or VPN requirements
+• Secure communication over public internet
 """),
             
-            ("ROI Analysis 📊", """
-**Investment vs. Return**
+            ("Agent Architecture", """
+Parent and Child Agent System
 
-Initial Investment:
-├── 1 CPU License (5 days): $15
-├── Domain (optional): $12/year
-└── Development time: 2-4 hours
-   ─────────────────────────
-   Total: ~$27 + 2-4 hours
+👑 Parent Agent (Licensed Machine):
+• Runs on machine with active license
+• Creates child agent configuration files
+• Manages cross-domain communication
+• Coordinates multi-agent workflows
+• Handles complex task delegation
 
-Permanent Assets Created:
-├── 1 Parent agent configuration
-├── 10-20 Child agents (never expire)
-├── Multi-agent coordination system
-└── Enterprise security infrastructure
-   ─────────────────────────
-   Cost per permanent agent: $0.75 - $1.50
+👥 Child Agent (Any Machine):
+• Uses configuration file created by parent
+• No license required on deployment machine
+• Permanent (works even after parent license expires)
+• Handles specific tasks and tools
+• Communicates via PubSub system
 
-**Business Impact:**
-• 🏭 Operational Efficiency: Automated workflows
-• 🔐 Security Compliance: Military-grade encryption
-• 📈 Scalability: No licensing overhead for child agents
-• 🌍 Global Reach: Cross-domain enterprise integration
+🔑 Key Technical Points:
+• Parent agents: Can Establish Direct secure communication without PubSub Server
+• Child agents: PubSub-based communication within applications
+• Configuration files contain all necessary security credentials
+• No ongoing license fees for child agents
 """),
             
-            ("Quick Start Workflow 🚀", """
-**1. Prerequisites & License**
-hexaeight-start check-prerequisites
-hexaeight-start license-activation
+            ("PubSub Communication System", """
+Secure Agent Messaging Architecture
 
-**2. Organized Development**
-hexaeight-start create-directory-linked-to-hexaeight-license my-ai-project
-cd my-ai-project
+🔄 Communication Flow:
 
-**3. Agent Generation**
-hexaeight-start generate-parent-or-child-agent-licenses
+Parent-to-Parent: Direct Secure Channels
+   Domain A ←→ Domain B (No PubSub required)
 
-**4. Deploy & Test**
-hexaeight-start deploy-multi-ai-agent-samples
+Parent-to-Child: PubSub Coordination
+   Parent → PubSub Server → Child Agents
 
-**5. Scale Globally**
-hexaeight-start setup-portable-child-agent-environment child_config.json
+Child-to-Child: Application-Scoped PubSub
+   Child A ←→ PubSub Server ←→ Child B (Same ClientID)
+
+🔐 Security Features:
+• End-to-end message encryption
+• Agent identity validation
+• Message locking for coordination
+• Cross-domain secure channels
+
+📡 PubSub Server:
+• Message routing and delivery
+• Agent presence management
+• Message queuing and reliability
+• Cross-application isolation
 """),
             
-            ("Success Metrics 📈", """
-**Technical Metrics**
-• ⚡ Activation Time: 2-5 minutes from zero to licensed
-• 🔐 Security Level: Military-grade encryption standard
-• 🌍 Deployment Scope: Global, no geographic limitations
-• ♾️ Agent Longevity: Child agents work indefinitely
+            ("Development Workflow", """
+Step-by-Step Development Process
 
-**Business Metrics**
-• 💰 Cost Efficiency: $0.75-$1.50 per permanent agent
-• 📈 Scalability: Unlimited child agents per license
-• 🚀 Time to Value: Deploy working agents in hours
-• 🔄 ROI Timeline: Immediate value, permanent assets
+✅ Prerequisites Complete:
+• HexaEight-Agentic-IAM Server deployed
+• Client Application created (ClientID, URLs)
+• Machine license activated
+• Environment variables configured
+
+🔧 Development Steps Post License Activation:
+
+1. Create Workspace Directory:
+   hexaeight-start create-directory-linked-to-hexaeight-license my-project
+
+2. Generate Agent Configurations:
+   hexaeight-start generate-parent-or-child-agent-licenses
+
+3. Deploy Sample System:
+   hexaeight-start deploy-multi-ai-agent-samples
+
+4. Test Framework Integration:
+   Run AutoGen, CrewAI, or LangChain samples with secure communication
+
+5. Develop Custom Agents:
+   Use hexaeight-mcp-client APIs in your Python code
 """),
             
-            ("Ready to Start? 🎯", """
-**Immediate Actions**
-1. 📱 Download HexaEight Authenticator app
-2. 🎲 Create generic resource or setup domain
-3. 🛒 Purchase license at store.hexaeight.com
-4. ⚡ Run activation process
+            ("Framework Integration Guide", """
+Using hexaeight-mcp-client in Your Code
 
-**Development Journey**
-1. 🔧 Generate agent configurations
-2. 🌤️ Deploy sample multi-agent system
-3. 🌍 Scale with portable child agents
-4. 🏢 Build enterprise AI infrastructure
+🐍 Python Integration:
 
-**Ready to transform your business with AI agents?**
+from hexaeight_mcp_client import quick_autogen_llm, quick_tool_agent
 
-Start with: hexaeight-start license-activation
+# Create LLM agent with secure identity
+llm_agent = await quick_autogen_llm('parent_config.json')
+
+# Create tool agent for specific services
+tool_agent = await quick_tool_agent(
+    'child_config.json', 
+    ['weather_api', 'database_query']
+)
+
+🔧 Framework Support:
+• AutoGen: Secure conversational agents
+• CrewAI: Role-based coordination
+• LangChain: Tool chaining with security
+• Custom: Generic adapter for any framework
+
+✅ What You Get:
+• Automatic secure communication setup
+• Built-in message encryption
+• Agent coordination primitives
+• No manual security implementation needed
 """)
         ]
 
-# Utility function to show concepts from anywhere
 def show_hexaeight_concepts(interactive: bool = True, auto_advance: bool = False):
-    """Show HexaEight concepts presentation"""
+    """Show HexaEight concepts presentation with clean UI"""
     cli = ConceptsPresentationCLI()
     args = []
     if interactive:
