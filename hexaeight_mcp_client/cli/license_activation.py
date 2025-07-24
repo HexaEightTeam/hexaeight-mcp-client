@@ -9,7 +9,8 @@ from .utils import (
     download_machine_token_utility,
     print_section, 
     confirm_action,
-    save_package_state
+    save_package_state,
+    get_template_content
 )
 
 class LicenseActivationCLI:
@@ -20,7 +21,7 @@ class LicenseActivationCLI:
         
         print_section(
             "HexaEight License Activation",
-            "This will set up the machine token utility for license activation."
+            "Set up the machine token utility for AI agent license activation."
         )
         
         # Check current directory
@@ -45,8 +46,8 @@ class LicenseActivationCLI:
             # Step 2: Run system verification
             self._run_system_verification(executable_path)
             
-            # Step 3: Guide through purchase and activation
-            self._guide_license_purchase_and_activation(executable_path)
+            # Step 3: Show the updated guide from markdown
+            self._show_activation_guide(executable_path)
             
         except Exception as e:
             print(f"❌ License activation setup failed: {e}")
@@ -81,22 +82,110 @@ class LicenseActivationCLI:
         
         print_section("✅ System Verification Complete", "Your system is ready for HexaEight license activation!")
     
-    def _guide_license_purchase_and_activation(self, executable_path: str) -> None:
-        """Guide user through license purchase and activation"""
+    def _show_activation_guide(self, executable_path: str) -> None:
+        """Show the complete activation guide from markdown template"""
         
-        print_section("AI Agent Identity & License Setup", "Understanding the HexaEight AI Agent Identity System...")
+        try:
+            # Load the markdown content
+            guide_content = get_template_content("license_activation_guide.md")
+            
+            # Replace placeholder with actual license directory
+            guide_content = guide_content.replace("{license_directory}", os.getcwd())
+            
+            # Convert markdown to formatted console output
+            self._display_formatted_guide(guide_content, executable_path)
+            
+        except Exception as e:
+            print(f"⚠️  Could not load activation guide: {e}")
+            # Fallback to basic guide
+            self._show_basic_activation_guide(executable_path)
+    
+    def _display_formatted_guide(self, content: str, executable_path: str) -> None:
+        """Display the markdown content in a formatted way for console"""
         
-        # Explain the concept
-        self._explain_agent_identity_concept()
+        lines = content.split('\n')
         
-        # Guide through domain setup
-        self._guide_domain_setup()
+        for line in lines:
+            # Skip markdown headers that are just # symbols
+            if line.strip().startswith('#') and not line.strip().startswith('##'):
+                continue
+                
+            # Convert ## headers to section breaks
+            if line.strip().startswith('##'):
+                title = line.replace('##', '').strip()
+                print_section(title)
+                continue
+            
+            # Convert ### headers to bold text
+            if line.strip().startswith('###'):
+                title = line.replace('###', '').strip()
+                print(f"\n{title}")
+                print("─" * len(title))
+                continue
+            
+            # Handle code blocks
+            if line.strip().startswith('```'):
+                continue
+                
+            # Handle lists and regular content
+            if line.strip():
+                print(line)
+            else:
+                print()  # Empty line
         
-        # Explain the value proposition
-        self._explain_license_value_proposition()
+        # Show the final activation prompt
+        self._show_activation_prompt(executable_path)
+    
+    def _show_basic_activation_guide(self, executable_path: str) -> None:
+        """Fallback basic activation guide"""
         
-        # Show activation process
-        self._show_activation_process(executable_path)
+        print_section("🎯 ✨ AI Agent License Activation! ✨ 🎯")
+        
+        print(f"🎲 **NEW: No Domain Required!**")
+        print(f"   Generate unique agent names instantly with HexaEight app")
+        print(f"   Examples: storm23-cloud-wave-bright09, app8-metal-zip-forward07")
+        print(f"")
+        print(f"📱 **Quick Setup (2 minutes):**")
+        print(f"   1. Download 'HexaEight Authenticator' app")
+        print(f"   2. Register with any email address")
+        print(f"   3. Tap 'Create Generic Resource' → get random name")
+        print(f"   4. Ready to use!")
+        print(f"")
+        print(f"💰 **Incredible Value:**")
+        print(f"   • License: ~$25-50")
+        print(f"   • Create unlimited child agents")
+        print(f"   • Child agents work forever!")
+        print(f"   • Deploy anywhere globally")
+        print(f"")
+        print(f"🚀 **Activation Steps:**")
+        print(f"   1. Visit: https://store.hexaeight.com")
+        print(f"   2. Run: ./{os.path.basename(executable_path)} --newtoken")
+        print(f"   3. Enter your generic resource name")
+        print(f"   4. Scan QR code with app")
+        print(f"   5. BOOM! Licensed and ready!")
+        
+        self._show_activation_prompt(executable_path)
+    
+    def _show_activation_prompt(self, executable_path: str) -> None:
+        """Show the activation prompt"""
+        
+        print(f"\n🎪 Ready to join the AI revolution?")
+        
+        if confirm_action("🚀 Start license activation now? (Have your generic resource ready!)", default=False):
+            self._start_license_activation(executable_path)
+        else:
+            print(f"\n🎯 No worries! Complete these quick steps:")
+            print(f"")
+            print(f"   📱 Download HexaEight app → 🎲 Create generic resource → 🛒 Purchase license")
+            print(f"")
+            print(f"🎊 Then return and run:")
+            print(f"   ✨ ./{os.path.basename(executable_path)} --newtoken")
+            print(f"")
+            print(f"🎈 Your machine is ready at: {os.getcwd()}")
+        
+        print(f"\n🔄 Future renewals:")
+        print(f"   ⚡ ./{os.path.basename(executable_path)} --renewtoken")
+    
     def _start_license_activation(self, executable_path: str) -> None:
         """Start interactive license activation"""
         
@@ -105,7 +194,7 @@ class LicenseActivationCLI:
         print(f"🔑 **License Activation Process Starting**")
         print(f"")
         print(f"The machine token utility will now:")
-        print(f"   1. 🔤 Ask for your resource name (e.g., weather-agent.yourdomain.com)")
+        print(f"   1. 🎲 Ask for your generic resource name (e.g., storm23-cloud-wave-bright09)")
         print(f"   2. 📱 Display a QR code URL for verification")
         print(f"   3. ⏳ Wait for your approval via HexaEight Authenticator app")
         print(f"   4. ✅ Create your license file upon verification")
@@ -156,33 +245,31 @@ class LicenseActivationCLI:
         print(f"")
         print(f"💪 **You Now Have Super Powers:**")
         print(f"")
-        print(f"🏢 **Immediate Actions Available:**")
-        print(f"   1. 🎯 Create Parent Agent (runs on this machine)")
+        print(f"🏢 **Next Steps - Execute These Commands:**")
+        print(f"")
+        print(f"   1. 🏗️  Create organized workspace:")
+        print(f"      hexaeight-start create-directory-linked-to-hexaeight-license my-ai-project")
+        print(f"")
+        print(f"   2. 🎯 Generate agent configurations:")
         print(f"      hexaeight-start generate-parent-or-child-agent-licenses")
         print(f"")
-        print(f"   2. 🏗️  Create Project Directories")
-        print(f"      hexaeight-create directory-linked-to-hexaeight-license my-ai-project")
+        print(f"   3. 🌤️  Deploy sample multi-agent system:")
+        print(f"      hexaeight-start deploy-multi-ai-agent-samples")
         print(f"")
-        print(f"   3. 🌤️  Deploy Sample Multi-Agent Weather System")
-        print(f"      hexaeight-deploy multi-ai-agent-samples")
+        print(f"   4. 📱 Setup portable child agents:")
+        print(f"      hexaeight-start setup-portable-child-agent-environment")
         print(f"")
-        print(f"👥 **Start Building Your Agent Army:**")
+        print(f"👥 **Build Your Agent Army Strategy:**")
         print(f"   • Create parent agent config (machine-bound, no password)")
         print(f"   • Generate unlimited child agents (32+ char passwords)")
         print(f"   • Deploy child agents to cloud, edge devices, anywhere!")
-        print(f"   • Build secure multi-agent AI applications")
+        print(f"   • Child agents work forever, even after license expires!")
         print(f"")
-        print(f"🌟 **Remember the Strategy:**")
+        print(f"🌟 **Remember the Winning Strategy:**")
         print(f"   ⏰ License Duration: Limited time to create agents")
         print(f"   👥 Child Agents: Unlimited creation during license period")
         print(f"   ♾️  Child Longevity: Work forever, even after license expires")
         print(f"   💎 Value: Permanent AI infrastructure from temporary license")
-        print(f"")
-        print(f"🚀 **Recommended First Steps:**")
-        print(f"   1. Create a parent agent configuration")
-        print(f"   2. Create 5-10 child agents immediately")
-        print(f"   3. Test the sample weather system")
-        print(f"   4. Build your own AI applications")
         print(f"")
         print(f"🎯 **Your license directory:** {os.getcwd()}")
         print(f"💪 **Time to build the future!**")
@@ -220,152 +307,3 @@ class LicenseActivationCLI:
             print(f"❌ Environment verification failed with exit code: {e.returncode}")
         except Exception as e:
             print(f"❌ Environment verification error: {e}")
-    
-    def _explain_agent_identity_concept(self) -> None:
-        """Explain the AI agent identity concept in an exciting way"""
-        
-        print(f"\n🎭 ✨ 🚀 Welcome to the Future of AI! 🚀 ✨ 🎭")
-        print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        print(f"")
-        print(f"💫 You're about to create something AMAZING...")
-        print(f"🤖 Professional AI agents with their own digital identities!")
-        print(f"")
-        print(f"🌟 Think Netflix, but for AI agents → weather-agent.yourcompany.com")
-        print(f"🌟 Think Gmail, but for AI agents → assistant-bot.yourbusiness.net")
-        print(f"🌟 Think Slack, but for AI agents → data-analyst.myservices.org")
-        print(f"")
-        print(f"🎯 Why is this REVOLUTIONARY?")
-        print(f"   💼 Professional business identity")
-        print(f"   🔐 Military-grade security") 
-        print(f"   🌍 Works globally, anywhere")
-        print(f"   ⚡ Enterprise-ready from day one")
-        print(f"")
-        print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    
-    def _guide_domain_setup(self) -> None:
-        """Guide through domain and email setup with visual appeal"""
-        
-        print(f"\n🛠️  ✨ Quick Setup Guide (Super Easy!) ✨ 🛠️")
-        print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        print(f"")
-        
-        print(f"🌐 ① Get a Domain (5 minutes)")
-        print(f"   💡 Need: yourcompany.com or yourbusiness.net")
-        print(f"   💰 Cost: ~$10-15/year (coffee money!)")
-        print(f"   🛒 Where: GoDaddy, Namecheap, Google Domains")
-        print(f"")
-        
-        print(f"📧 ② Create Domain Email (2 minutes)")
-        print(f"   ✨ Examples: admin@yourdomain.com")
-        print(f"   ✨ Examples: ai@yourbusiness.com")
-        print(f"")
-        
-        print(f"📱 ③ Download HexaEight App (1 minute)")
-        print(f"   🎯 Search: 'HexaEight Authenticator'")
-        print(f"   📲 Available: iOS & Android")
-        print(f"   ✅ Register with your domain email")
-        print(f"")
-        
-        print(f"🔧 ④ Create AI Agent Resource (3 minutes)")
-        print(f"   🎨 Name: weather-agent.yourdomain.com")
-        print(f"   📝 App gives you DNS record → copy to domain")
-        print(f"   ✅ Verify ownership → DONE!")
-        print(f"")
-        print(f"⏰ Total time: ~11 minutes to AI agent greatness!")
-        print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    
-    def _explain_license_value_proposition(self) -> None:
-        """Explain the value proposition with excitement and visual appeal"""
-        
-        print(f"\n💎 🚀 🎉 The INCREDIBLE License Deal! 🎉 🚀 💎")
-        print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        print(f"")
-        
-        print(f"🤯 Here's the MIND-BLOWING part...")
-        print(f"")
-        print(f"👑 Parent Agent:")
-        print(f"   🏢 Runs on your machine")
-        print(f"   ⏰ Valid for license duration")
-        print(f"   🔑 No passwords needed")
-        print(f"")
-        
-        print(f"🌟 Child Agents (THE MAGIC!):")
-        print(f"   ♾️  UNLIMITED creation!")
-        print(f"   💪 NEVER EXPIRE!")
-        print(f"   🌍 Run ANYWHERE!")
-        print(f"   🔐 Military-grade security!")
-        print(f"")
-        
-        print(f"💰 The Math That Will Blow Your Mind:")
-        print(f"")
-        print(f"   💵 License cost: ~$25-50")
-        print(f"   ⚡ Create 20 child agents in 5 days")
-        print(f"   ♾️  Those agents work FOREVER")
-        print(f"   📊 Cost per agent: $1.25-2.50")
-        print(f"   🎯 Value: PRICELESS!")
-        print(f"")
-        
-        print(f"🚀 Your Strategy:")
-        print(f"   ① Buy short license (smart move!)")
-        print(f"   ② Create MANY child agents (go crazy!)")
-        print(f"   ③ Deploy everywhere (cloud, edge, mobile!)")
-        print(f"   ④ Profit from permanent AI workforce!")
-        print(f"")
-        
-        print(f"🎊 BONUS FEATURES:")
-        print(f"   🔒 Zero external threats")
-        print(f"   🤝 Agents talk to each other securely")
-        print(f"   📡 Global PubSub network")
-        print(f"   🎯 Enterprise-ready instantly")
-        print(f"")
-        
-        print(f"🏆 Bottom Line: One coffee's worth = AI empire!")
-        print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    
-    def _show_activation_process(self, executable_path: str) -> None:
-        """Show the activation process with visual excitement"""
-        
-        print(f"\n🎯 ✨ License Activation Magic! ✨ 🎯")
-        print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        print(f"")
-        
-        print(f"🛒 ① Visit Store")
-        print(f"   🌐 https://store.hexaeight.com")
-        print(f"   💡 Pick your license duration")
-        print(f"")
-        
-        print(f"🔧 ② Run Magic Command")
-        print(f"   ✨ ./{os.path.basename(executable_path)} --newtoken")
-        print(f"   🎯 Enter: weather-agent.yourdomain.com")
-        print(f"")
-        
-        print(f"📱 ③ QR Code Fun")
-        print(f"   📸 Machine shows QR code")
-        print(f"   👆 Tap your resource in app")
-        print(f"   ⚡ Scan & approve")
-        print(f"")
-        
-        print(f"🎉 ④ BOOM! Licensed!")
-        print(f"   ⏎  Press Enter")
-        print(f"   📄 hexaeight.mac created")
-        print(f"   🚀 Ready to build!")
-        print(f"")
-        print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        
-        # Ask with more excitement
-        print(f"\n🎪 Ready to join the AI revolution?")
-        
-        if confirm_action("🚀 Start activation now? (Have your domain resource ready!)", default=False):
-            self._start_license_activation(executable_path)
-        else:
-            print(f"\n🎯 No worries! Complete these quick steps:")
-            print(f"")
-            print(f"   🌐 Get domain → 📧 Create email → 📱 Setup app → 🔧 Create resource")
-            print(f"")
-            print(f"🎊 Then return and run:")
-            print(f"   ✨ ./{os.path.basename(executable_path)} --newtoken")
-            print(f"")
-            print(f"🎈 Your machine is ready at: {os.getcwd()}")
-        
-        print(f"\n🔄 Renewal when needed:")
-        print(f"   ⚡ ./{os.path.basename(executable_path)} --renewtoken")

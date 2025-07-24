@@ -68,13 +68,11 @@ from .exceptions import (
     TaskCoordinationError
 )
 
-# CLI tools exports
+# UPDATED: CLI tools exports - unified under hexaeight-start only
 from .cli.main import (
     hexaeight_start,
-    hexaeight_check, 
-    hexaeight_create,
-    hexaeight_deploy,
-    hexaeight_setup
+    print_unified_cli_help,
+    get_cli_commands
 )
 
 # All exports for external use
@@ -122,14 +120,10 @@ __all__ = [
     "quick_tool_agent",
     "quick_user_agent",
     
-    # CLI tools
+    # UPDATED: CLI tools - unified interface only
     "hexaeight_start",
-    "hexaeight_check",
-    "hexaeight_create", 
-    "hexaeight_deploy",
+    "print_unified_cli_help",
     "get_cli_commands",
-    "print_cli_help",
-    "hexaeight_setup",
     
     # Exceptions
     "HexaEightMCPError",
@@ -197,6 +191,7 @@ def print_package_info():
     print(f"  ✅ Framework integration (AutoGen, CrewAI, LangChain)")
     print(f"  ✅ Broadcast message filtering")
     print(f"  ✅ Tool agent format detection")
+    print(f"  ✅ Generic resource names (no domain required)")
     
     print(f"\nQuick Start:")
     print(f"  # AutoGen LLM Agent")
@@ -208,33 +203,54 @@ def print_package_info():
     print(f"  # User Agent")
     print(f"  user = await quick_user_agent('user_config.json')")
 
-# CLI information functions
+# UPDATED: CLI information functions for unified structure only
 def get_cli_commands():
-    """Get available CLI commands"""
+    """Get available CLI commands for unified structure"""
     return {
-        "hexaeight-start": "Start HexaEight services (license-activation, generate-agents)",
-        "hexaeight-check": "Check prerequisites and system requirements", 
-        "hexaeight-create": "Create project directories with license hardlinks",
-        "hexaeight-deploy": "Deploy sample multi-agent systems",
-        "hexaeight-setup": "Setup portable child agent environments"
+        "hexaeight-start": "Unified command interface for all HexaEight MCP Client operations"
     }
 
 def print_cli_help():
-    """Print CLI help information"""
-    print(f"🔧 HexaEight MCP Client v{__version__} - CLI Tools")
-    print("=" * 60)
+    """Print CLI help information for unified structure only"""
+    print(f"🔧 HexaEight MCP Client v{__version__} - Unified CLI Interface")
+    print("=" * 65)
     
-    commands = get_cli_commands()
-    for command, description in commands.items():
-        print(f"  {command.ljust(20)}: {description}")
+    print(f"\n📋 AVAILABLE COMMAND:")
+    print(f"  hexaeight-start <subcommand>    All operations through unified interface")
     
-    print(f"\nExamples:")
-    print(f"  hexaeight-start license-activation")
-    print(f"  hexaeight-check check-prerequisites")
-    print(f"  hexaeight-create directory-linked-to-hexaeight-license my-project")
-    print(f"  hexaeight-deploy multi-ai-agent-samples")
-    print(f"  hexaeight-setup portable-child-agent-environment child_config.json")  # NEW LINE
-    print(f"\nFor more information: https://github.com/HexaEightTeam/hexaeight-mcp-client")
+    print(f"\n🔧 SUBCOMMANDS:")
+    subcommands = [
+        ("check-prerequisites", "Check system requirements (.NET, dotnet-script)"),
+        ("license-activation", "Setup and activate HexaEight license"),
+        ("create-directory-linked-to-hexaeight-license <dir>", "Create project workspace"),
+        ("generate-parent-or-child-agent-licenses", "Generate agent configurations"),
+        ("deploy-multi-ai-agent-samples", "Deploy sample multi-agent systems"),
+        ("setup-portable-child-agent-environment [config]", "Setup portable child agents")
+    ]
+    
+    for cmd, desc in subcommands:
+        print(f"  {cmd:<50} {desc}")
+    
+    print(f"\n🚀 COMPLETE WORKFLOW:")
+    print(f"  1. hexaeight-start check-prerequisites")
+    print(f"  2. hexaeight-start license-activation")
+    print(f"  3. hexaeight-start create-directory-linked-to-hexaeight-license my-project")
+    print(f"  4. cd my-project")
+    print(f"  5. hexaeight-start generate-parent-or-child-agent-licenses")
+    print(f"  6. hexaeight-start deploy-multi-ai-agent-samples")
+    
+    print(f"\n🎯 NEW FEATURES:")
+    print(f"  • Generic resource names (no domain required!)")
+    print(f"  • 2-minute setup with HexaEight Authenticator app")
+    print(f"  • Instant AI agent identities: storm23-cloud-wave-bright09")
+    print(f"  • Unlimited child agents with temporary license")
+    print(f"  • Child agents work forever, even after license expires")
+    
+    print(f"\n🔗 Resources:")
+    print(f"  📖 Documentation: https://github.com/HexaEightTeam/hexaeight-mcp-client")
+    print(f"  🛒 License Store: https://store.hexaeight.com")
+    print(f"  📱 Mobile App: Search 'HexaEight Authenticator'")
+    print(f"\n💡 Only 'hexaeight-start' command is available - clean, unified interface!")
 
 # Configuration validation helpers
 def validate_agent_type(agent_type: str) -> bool:
@@ -408,6 +424,10 @@ HEXAEIGHT_TOKEN_SERVER_URL=https://your-token-server.com
     print("3. Start your PubSub server")
     print("4. Create your first agent:")
     print("   agent = await quick_autogen_llm('parent_config.json')")
+    print("\nUnified CLI Usage:")
+    print("   hexaeight-start check-prerequisites")
+    print("   hexaeight-start license-activation")
+    print("   hexaeight-start create-directory-linked-to-hexaeight-license my-project")
     
     return True
 

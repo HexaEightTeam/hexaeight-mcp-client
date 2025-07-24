@@ -1,5 +1,6 @@
 """
 Main CLI dispatcher for HexaEight MCP Client
+Updated to use unified hexaeight-start command structure
 """
 
 import sys
@@ -13,9 +14,25 @@ from .sample_deployment import SampleDeploymentCLI
 from .portable_setup import PortableSetupCLI
 
 def main():
-    """Main CLI entry point"""
+    """Main CLI entry point - Legacy support"""
+    print("⚠️  This legacy entry point is no longer available.")
+    print("💡 Please use the unified command structure:")
+    print("   hexaeight-start <command>")
+    print("")
+    print("🔧 Available commands:")
+    print("   hexaeight-start check-prerequisites")
+    print("   hexaeight-start license-activation")
+    print("   hexaeight-start create-directory-linked-to-hexaeight-license")
+    print("   hexaeight-start generate-parent-or-child-agent-licenses")
+    print("   hexaeight-start deploy-multi-ai-agent-samples")
+    print("   hexaeight-start setup-portable-child-agent-environment")
     
-    if len(sys.argv) < 2:
+    sys.exit(1)
+
+def hexaeight_start():
+    """Unified entry point for all HexaEight MCP Client commands"""
+    
+    if len(sys.argv) < 2 or sys.argv[1] in ['--help', '-h', 'help']:
         print_help()
         sys.exit(1)
     
@@ -23,26 +40,26 @@ def main():
     args = sys.argv[2:]
     
     try:
-        if command == "license-activation":
-            cli = LicenseActivationCLI()
-            cli.run(args)
-        elif command == "check-prerequisites":
+        if command == "check-prerequisites":
             cli = PrerequisitesCLI()
             cli.run(args)
-        elif command == "directory-linked-to-hexaeight-license":
+        elif command == "license-activation":
+            cli = LicenseActivationCLI()
+            cli.run(args)
+        elif command == "create-directory-linked-to-hexaeight-license":
             if not args:
                 print("❌ Error: Directory name required")
-                print("Usage: hexaeight-create directory-linked-to-hexaeight-license <directory_name>")
+                print("Usage: hexaeight-start create-directory-linked-to-hexaeight-license <directory_name>")
                 sys.exit(1)
             cli = DirectorySetupCLI()
             cli.run(args[0])
         elif command == "generate-parent-or-child-agent-licenses":
             cli = AgentGenerationCLI()
             cli.run(args)
-        elif command == "multi-ai-agent-samples":
+        elif command == "deploy-multi-ai-agent-samples":
             cli = SampleDeploymentCLI()
             cli.run(args)
-        elif command == "portable-child-agent-environment":
+        elif command == "setup-portable-child-agent-environment":
             cli = PortableSetupCLI()
             cli.run(args)
         else:
@@ -58,166 +75,125 @@ def main():
         sys.exit(1)
 
 def print_help():
-    """Print main help"""
+    """Print comprehensive help for the unified command structure"""
     print("""
-🚀 HexaEight MCP Client CLI Tools
+🚀 HexaEight MCP Client - Unified Command Interface
 
-Available Commands:
-  hexaeight-start license-activation                       - Setup machine token utility for license activation
-  hexaeight-check check-prerequisites                      - Verify .NET and dotnet-script installation  
-  hexaeight-create directory-linked-to-hexaeight-license <dir> - Create project directory with license hardlinks
-  hexaeight-start generate-parent-or-child-agent-licenses - Generate agent configuration files
-  hexaeight-deploy multi-ai-agent-samples                 - Deploy sample multi-agent weather system
-  hexaeight-setup portable-child-agent-environment [config] - Setup portable child agent on secondary machine
+USAGE:
+    hexaeight-start <command> [arguments]
 
-Examples:
-  hexaeight-start license-activation
-  hexaeight-check check-prerequisites
-  hexaeight-create directory-linked-to-hexaeight-license my-project
-  hexaeight-start generate-parent-or-child-agent-licenses
-  hexaeight-deploy multi-ai-agent-samples
-  hexaeight-setup portable-child-agent-environment child_config.json
+COMMANDS:
+    check-prerequisites                              Check system requirements (.NET, dotnet-script)
+    license-activation                               Setup machine token utility for license activation
+    create-directory-linked-to-hexaeight-license    Create project directory with license hardlinks
+    generate-parent-or-child-agent-licenses         Generate agent configuration files
+    deploy-multi-ai-agent-samples                   Deploy sample multi-agent weather system
+    setup-portable-child-agent-environment          Setup portable child agent on secondary machine
 
-For more information, visit: https://github.com/HexaEightTeam/hexaeight-mcp-client
+WORKFLOW:
+    🔧 Complete Setup Workflow:
+    
+    1. Check Prerequisites:
+       hexaeight-start check-prerequisites
+    
+    2. Activate License (one time):
+       hexaeight-start license-activation
+    
+    3. Create Organized Workspace:
+       hexaeight-start create-directory-linked-to-hexaeight-license my-ai-project
+       cd my-ai-project
+    
+    4. Generate Agent Configurations:
+       hexaeight-start generate-parent-or-child-agent-licenses
+    
+    5. Deploy Sample System:
+       hexaeight-start deploy-multi-ai-agent-samples
+    
+    6. Setup Child Agents on Other Machines:
+       hexaeight-start setup-portable-child-agent-environment child_config.json
+
+EXAMPLES:
+    # Check if system is ready
+    hexaeight-start check-prerequisites
+    
+    # Activate license (creates hexaeight.mac)
+    hexaeight-start license-activation
+    
+    # Create project workspace with license links
+    hexaeight-start create-directory-linked-to-hexaeight-license weather-agents
+    
+    # Generate parent and child agent configs
+    hexaeight-start generate-parent-or-child-agent-licenses
+    
+    # Deploy sample weather system (AutoGen, CrewAI, LangChain)
+    hexaeight-start deploy-multi-ai-agent-samples
+    
+    # Setup child agent environment on cloud/edge device
+    hexaeight-start setup-portable-child-agent-environment child_weather_01.json
+
+KEY CONCEPTS:
+    🏢 Parent Agent:   Runs on licensed machine, creates child agents
+    👥 Child Agents:   Run anywhere, work forever, unlimited creation
+    🔗 License Links:  Hardlinks allow organized project structure
+    📱 Portable Setup: Deploy child agents on secondary machines
+    🌤️  Sample System:  Multi-framework weather agents for testing
+    🎲 Generic Names:  No domain required - instant random agent identities
+
+MORE INFO:
+    📖 Documentation: https://github.com/HexaEightTeam/hexaeight-mcp-client
+    🛒 License Store:  https://store.hexaeight.com
+    📱 Mobile App:     Search "HexaEight Authenticator" in app stores
+
+NOTE: Only 'hexaeight-start' command is available - clean, unified interface!
 """)
 
-# Console script entry points
-def hexaeight_start():
-    """Entry point for hexaeight-start commands"""
-    
-    # Handle help flags
-    if len(sys.argv) < 2 or sys.argv[1] in ['--help', '-h', 'help']:
-        print("🚀 HexaEight MCP Client - Start Commands")
-        print("Usage: hexaeight-start <command>")
-        print("")
-        print("Available commands:")
-        print("  license-activation                       - Setup machine token utility")
-        print("  generate-parent-or-child-agent-licenses - Generate agent configs")
-        print("")
-        print("Examples:")
-        print("  hexaeight-start license-activation")
-        print("  hexaeight-start generate-parent-or-child-agent-licenses")
-        return
-    
-    command = sys.argv[1]
-    args = sys.argv[2:]
-    
-    if command == "license-activation":
-        cli = LicenseActivationCLI()
-        cli.run(args)
-    elif command == "generate-parent-or-child-agent-licenses":
-        cli = AgentGenerationCLI()
-        cli.run(args)
-    else:
-        print(f"❌ Unknown hexaeight-start command: {command}")
-        print("Run 'hexaeight-start --help' for available commands")
-        sys.exit(1)
+# Enhanced help function for the main package
+def get_cli_commands():
+    """Get available CLI commands for the unified structure"""
+    return {
+        "hexaeight-start": "Unified command interface for all HexaEight MCP Client operations",
+        "check-prerequisites": "Check system requirements and dependencies",
+        "license-activation": "Setup and activate HexaEight license",
+        "create-directory-linked-to-hexaeight-license": "Create organized project workspace",
+        "generate-parent-or-child-agent-licenses": "Generate agent configurations",
+        "deploy-multi-ai-agent-samples": "Deploy sample multi-agent systems",
+        "setup-portable-child-agent-environment": "Setup child agents on secondary machines"
+    }
 
-def hexaeight_check():
-    """Entry point for hexaeight-check commands"""
+def print_unified_cli_help():
+    """Print unified CLI help information"""
+    print(f"🔧 HexaEight MCP Client - Unified Command Interface")
+    print("=" * 65)
     
-    # Handle help flags
-    if len(sys.argv) < 2 or sys.argv[1] in ['--help', '-h', 'help']:
-        print("🔍 HexaEight MCP Client - Check Commands")
-        print("Usage: hexaeight-check <command>")
-        print("")
-        print("Available commands:")
-        print("  check-prerequisites - Verify system requirements")
-        print("")
-        print("Examples:")
-        print("  hexaeight-check check-prerequisites")
-        return
+    commands = get_cli_commands()
     
-    command = sys.argv[1]
-    args = sys.argv[2:]
+    print(f"\n📋 MAIN COMMAND:")
+    print(f"  hexaeight-start <subcommand>    All operations through unified interface")
     
-    if command == "check-prerequisites":
-        cli = PrerequisitesCLI()
-        cli.run(args)
-    else:
-        print(f"❌ Unknown hexaeight-check command: {command}")
-        print("Run 'hexaeight-check --help' for available commands")
-        sys.exit(1)
-
-def hexaeight_create():
-    """Entry point for hexaeight-create commands"""
+    print(f"\n🔧 SUBCOMMANDS:")
+    subcommands = [
+        ("check-prerequisites", "Check system requirements"),
+        ("license-activation", "Setup and activate license"),
+        ("create-directory-linked-to-hexaeight-license", "Create project workspace"),
+        ("generate-parent-or-child-agent-licenses", "Generate agent configs"),
+        ("deploy-multi-ai-agent-samples", "Deploy sample systems"),
+        ("setup-portable-child-agent-environment", "Setup portable child agents")
+    ]
     
-    # Handle help flags
-    if len(sys.argv) < 2 or sys.argv[1] in ['--help', '-h', 'help']:
-        print("📁 HexaEight MCP Client - Create Commands")
-        print("Usage: hexaeight-create <command>")
-        print("")
-        print("Available commands:")
-        print("  directory-linked-to-hexaeight-license <dir> - Create project directory")
-        print("")
-        print("Examples:")
-        print("  hexaeight-create directory-linked-to-hexaeight-license my-project")
-        return
+    for cmd, desc in subcommands:
+        print(f"  {cmd:<45} {desc}")
     
-    command = sys.argv[1]
-    args = sys.argv[2:]
+    print(f"\n🚀 WORKFLOW EXAMPLES:")
+    print(f"  hexaeight-start check-prerequisites")
+    print(f"  hexaeight-start license-activation")
+    print(f"  hexaeight-start create-directory-linked-to-hexaeight-license my-project")
+    print(f"  hexaeight-start generate-parent-or-child-agent-licenses")
+    print(f"  hexaeight-start deploy-multi-ai-agent-samples")
+    print(f"  hexaeight-start setup-portable-child-agent-environment child_config.json")
     
-    if command == "directory-linked-to-hexaeight-license":
-        if not args:
-            print("❌ Error: Directory name required")
-            print("Usage: hexaeight-create directory-linked-to-hexaeight-license <directory_name>")
-            sys.exit(1)
-        cli = DirectorySetupCLI()
-        cli.run(args[0])
-    else:
-        print(f"❌ Unknown hexaeight-create command: {command}")
-        print("Run 'hexaeight-create --help' for available commands")
-        sys.exit(1)
-
-def hexaeight_deploy():
-    """Entry point for hexaeight-deploy commands"""
+    print(f"\n🔗 Resources:")
+    print(f"  📖 Documentation: https://github.com/HexaEightTeam/hexaeight-mcp-client")
+    print(f"  🛒 License Store: https://store.hexaeight.com")
+    print(f"  📱 Mobile App: Search 'HexaEight Authenticator'")
     
-    # Handle help flags
-    if len(sys.argv) < 2 or sys.argv[1] in ['--help', '-h', 'help']:
-        print("🚀 HexaEight MCP Client - Deploy Commands")
-        print("Usage: hexaeight-deploy <command>")
-        print("")
-        print("Available commands:")
-        print("  multi-ai-agent-samples - Deploy sample weather agent system")
-        print("")
-        print("Examples:")
-        print("  hexaeight-deploy multi-ai-agent-samples")
-        return
-    
-    command = sys.argv[1]
-    args = sys.argv[2:]
-    
-    if command == "multi-ai-agent-samples":
-        cli = SampleDeploymentCLI()
-        cli.run(args)
-    else:
-        print(f"❌ Unknown hexaeight-deploy command: {command}")
-        print("Run 'hexaeight-deploy --help' for available commands")
-        sys.exit(1)
-
-def hexaeight_setup():
-    """Entry point for hexaeight-setup commands"""
-    
-    # Handle help flags
-    if len(sys.argv) < 2 or sys.argv[1] in ['--help', '-h', 'help']:
-        print("🔧 HexaEight MCP Client - Setup Commands")
-        print("Usage: hexaeight-setup <command>")
-        print("")
-        print("Available commands:")
-        print("  portable-child-agent-environment [config] - Setup child agent on secondary machine")
-        print("")
-        print("Examples:")
-        print("  hexaeight-setup portable-child-agent-environment")
-        print("  hexaeight-setup portable-child-agent-environment child_config.json")
-        return
-    
-    command = sys.argv[1]
-    args = sys.argv[2:]
-    
-    if command == "portable-child-agent-environment":
-        cli = PortableSetupCLI()
-        cli.run(args)
-    else:
-        print(f"❌ Unknown hexaeight-setup command: {command}")
-        print("Run 'hexaeight-setup --help' for available commands")
-        sys.exit(1)
+    print(f"\n💡 All commands now use the unified 'hexaeight-start' interface!")
