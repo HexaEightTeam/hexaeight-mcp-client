@@ -1,6 +1,6 @@
 """
 Main CLI dispatcher for HexaEight MCP Client
-Updated to use unified hexaeight-start command structure
+Updated to include clean license activation and concepts presentation
 """
 
 import sys
@@ -12,6 +12,7 @@ from .directory_setup import DirectorySetupCLI
 from .agent_generation import AgentGenerationCLI
 from .sample_deployment import SampleDeploymentCLI
 from .portable_setup import PortableSetupCLI
+from .concepts_presentation import ConceptsPresentationCLI
 
 def main():
     """Main CLI entry point - Legacy support"""
@@ -21,6 +22,7 @@ def main():
     print("")
     print("🔧 Available commands:")
     print("   hexaeight-start check-prerequisites")
+    print("   hexaeight-start show-concepts")
     print("   hexaeight-start license-activation")
     print("   hexaeight-start create-directory-linked-to-hexaeight-license")
     print("   hexaeight-start generate-parent-or-child-agent-licenses")
@@ -42,6 +44,9 @@ def hexaeight_start():
     try:
         if command == "check-prerequisites":
             cli = PrerequisitesCLI()
+            cli.run(args)
+        elif command == "show-concepts":
+            cli = ConceptsPresentationCLI()
             cli.run(args)
         elif command == "license-activation":
             cli = LicenseActivationCLI()
@@ -84,39 +89,49 @@ USAGE:
 
 COMMANDS:
     check-prerequisites                              Check system requirements (.NET, dotnet-script)
-    license-activation                               Setup machine token utility for license activation
+    show-concepts                                    Learn about HexaEight AI agent concepts (NEW!)
+    license-activation                               Clean license activation process
     create-directory-linked-to-hexaeight-license    Create project directory with license hardlinks
     generate-parent-or-child-agent-licenses         Generate agent configuration files
     deploy-multi-ai-agent-samples                   Deploy sample multi-agent weather system
     setup-portable-child-agent-environment          Setup portable child agent on secondary machine
 
-WORKFLOW:
-    🔧 Complete Setup Workflow:
+LEARNING WORKFLOW:
+    🎓 Understanding the Concepts:
     
-    1. Check Prerequisites:
+    1. Learn the concepts first:
+       hexaeight-start show-concepts
+    
+    2. Check system requirements:
        hexaeight-start check-prerequisites
     
-    2. Activate License (one time):
+    3. Quick and clean activation:
        hexaeight-start license-activation
+
+DEVELOPMENT WORKFLOW:
+    🔧 Complete Setup Process:
     
-    3. Create Organized Workspace:
+    1. Create Organized Workspace:
        hexaeight-start create-directory-linked-to-hexaeight-license my-ai-project
        cd my-ai-project
     
-    4. Generate Agent Configurations:
+    2. Generate Agent Configurations:
        hexaeight-start generate-parent-or-child-agent-licenses
     
-    5. Deploy Sample System:
+    3. Deploy Sample System:
        hexaeight-start deploy-multi-ai-agent-samples
     
-    6. Setup Child Agents on Other Machines:
+    4. Setup Child Agents on Other Machines:
        hexaeight-start setup-portable-child-agent-environment child_config.json
 
 EXAMPLES:
-    # Check if system is ready
-    hexaeight-start check-prerequisites
+    # Learn concepts with interactive presentation
+    hexaeight-start show-concepts
     
-    # Activate license (creates hexaeight.mac)
+    # Auto-advancing presentation (no interaction)
+    hexaeight-start show-concepts --auto
+    
+    # Clean, focused license activation
     hexaeight-start license-activation
     
     # Create project workspace with license links
@@ -127,24 +142,21 @@ EXAMPLES:
     
     # Deploy sample weather system (AutoGen, CrewAI, LangChain)
     hexaeight-start deploy-multi-ai-agent-samples
-    
-    # Setup child agent environment on cloud/edge device
-    hexaeight-start setup-portable-child-agent-environment child_weather_01.json
 
-KEY CONCEPTS:
-    🏢 Parent Agent:   Runs on licensed machine, creates child agents
-    👥 Child Agents:   Run anywhere, work forever, unlimited creation
-    🔗 License Links:  Hardlinks allow organized project structure
-    📱 Portable Setup: Deploy child agents on secondary machines
-    🌤️  Sample System:  Multi-framework weather agents for testing
-    🎲 Generic Names:  No domain required - instant random agent identities
+KEY CONCEPTS QUICK REFERENCE:
+    🏢 Parent Agent:   Licensed machine, creates child agents, handles tasks
+    👥 Child Agents:   Deploy anywhere, work forever, unlimited creation
+    🔗 License Links:  Hardlinks enable organized project structure
+    📱 Portable Setup: Deploy child agents on cloud/edge devices
+    🎲 Generic Names:  No domain required - instant agent identities
+    ⚡ 2-Min Setup:    Download app → create resource → activate license
 
 MORE INFO:
     📖 Documentation: https://github.com/HexaEightTeam/hexaeight-mcp-client
     🛒 License Store:  https://store.hexaeight.com
     📱 Mobile App:     Search "HexaEight Authenticator" in app stores
 
-NOTE: Only 'hexaeight-start' command is available - clean, unified interface!
+NOTE: Clean, focused interface - concepts separated from activation process!
 """)
 
 # Enhanced help function for the main package
@@ -153,7 +165,8 @@ def get_cli_commands():
     return {
         "hexaeight-start": "Unified command interface for all HexaEight MCP Client operations",
         "check-prerequisites": "Check system requirements and dependencies",
-        "license-activation": "Setup and activate HexaEight license",
+        "show-concepts": "Interactive presentation of HexaEight AI agent concepts",
+        "license-activation": "Clean, focused license activation process",
         "create-directory-linked-to-hexaeight-license": "Create organized project workspace",
         "generate-parent-or-child-agent-licenses": "Generate agent configurations",
         "deploy-multi-ai-agent-samples": "Deploy sample multi-agent systems",
@@ -162,7 +175,7 @@ def get_cli_commands():
 
 def print_unified_cli_help():
     """Print unified CLI help information"""
-    print(f"🔧 HexaEight MCP Client - Unified Command Interface")
+    print(f"🔧 HexaEight MCP Client - Clean Unified Interface")
     print("=" * 65)
     
     commands = get_cli_commands()
@@ -173,7 +186,8 @@ def print_unified_cli_help():
     print(f"\n🔧 SUBCOMMANDS:")
     subcommands = [
         ("check-prerequisites", "Check system requirements"),
-        ("license-activation", "Setup and activate license"),
+        ("show-concepts", "Learn AI agent concepts (interactive slides)"),
+        ("license-activation", "Clean license activation process"),
         ("create-directory-linked-to-hexaeight-license", "Create project workspace"),
         ("generate-parent-or-child-agent-licenses", "Generate agent configs"),
         ("deploy-multi-ai-agent-samples", "Deploy sample systems"),
@@ -183,17 +197,20 @@ def print_unified_cli_help():
     for cmd, desc in subcommands:
         print(f"  {cmd:<45} {desc}")
     
-    print(f"\n🚀 WORKFLOW EXAMPLES:")
-    print(f"  hexaeight-start check-prerequisites")
-    print(f"  hexaeight-start license-activation")
+    print(f"\n🎓 LEARNING PATH:")
+    print(f"  hexaeight-start show-concepts                    # Learn concepts first")
+    print(f"  hexaeight-start check-prerequisites              # Check system")
+    print(f"  hexaeight-start license-activation               # Clean activation")
+    
+    print(f"\n🚀 DEVELOPMENT PATH:")
     print(f"  hexaeight-start create-directory-linked-to-hexaeight-license my-project")
     print(f"  hexaeight-start generate-parent-or-child-agent-licenses")
     print(f"  hexaeight-start deploy-multi-ai-agent-samples")
-    print(f"  hexaeight-start setup-portable-child-agent-environment child_config.json")
+    print(f"  hexaeight-start setup-portable-child-agent-environment")
     
     print(f"\n🔗 Resources:")
     print(f"  📖 Documentation: https://github.com/HexaEightTeam/hexaeight-mcp-client")
     print(f"  🛒 License Store: https://store.hexaeight.com")
     print(f"  📱 Mobile App: Search 'HexaEight Authenticator'")
     
-    print(f"\n💡 All commands now use the unified 'hexaeight-start' interface!")
+    print(f"\n💡 Clean separation: concepts presentation separate from activation process!")
