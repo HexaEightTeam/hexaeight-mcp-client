@@ -6,7 +6,7 @@ import os
 import subprocess
 from typing import List
 from .utils import (
-    extract_machine_token_utility, 
+    download_machine_token_utility,
     print_section, 
     confirm_action,
     save_package_state
@@ -54,7 +54,7 @@ class LicenseActivationCLI:
     
     def _extract_utility(self) -> str:
         """Extract and setup machine token utility"""
-        executable_path = extract_machine_token_utility()
+        executable_path = download_machine_token_utility()
         
         # Save license directory for future reference
         save_package_state("license_directory", os.getcwd())

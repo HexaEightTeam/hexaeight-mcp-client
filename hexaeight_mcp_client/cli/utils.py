@@ -9,6 +9,8 @@ import subprocess
 import zipfile
 import shutil
 import json
+import urllib.request
+import urllib.error
 from pathlib import Path
 from typing import Optional, Dict, Any, List, Tuple
 
@@ -24,6 +26,8 @@ def get_platform_info() -> Tuple[str, str]:
     system = platform.system().lower()
     machine = platform.machine().lower()
     
+    print(f"🔍 System: {system}, Machine: {machine}")
+    
     if system == "windows":
         return "win-x64", "HexaEight-Machine-Tokens-Utility.exe"
     elif system == "darwin":  # macOS
@@ -34,37 +38,100 @@ def get_platform_info() -> Tuple[str, str]:
         else:
             return "linux-64", "HexaEight-Machine-Tokens-Utility"
     else:
-        raise Exception(f"Unsupported platform: {system}")
+        raise Exception(f"Unsupported platform: {system} ({machine})")
 
-def extract_machine_token_utility() -> str:
-    """Extract machine token utility to current directory"""
+def check_network_connectivity() -> bool:
+    """Check if network is available for downloads"""
+    try:
+        urllib.request.urlopen('https://github.com', timeout=10)
+        return True
+    except Exception as e:
+        print(f"⚠️  Network check failed: {e}")
+        return False
+
+def download_file_with_progress(url: str, filename: str) -> None:
+    """Download file with progress indication"""
+    def show_progress(block_num, block_size, total_size):
+        if total_size > 0:
+            downloaded = block_num * block_size
+            percent = min(100, (downloaded * 100) // total_size)
+            mb_downloaded = downloaded / (1024 * 1024)
+            mb_total = total_size / (1024 * 1024)
+            print(f"\r📥 Downloading: {percent}% ({mb_downloaded:.1f}/{mb_total:.1f} MB)", end='', flush=True)
+        else:
+            downloaded = block_num * block_size
+            mb_downloaded = downloaded / (1024 * 1024)
+            print(f"\r📥 Downloaded: {mb_downloaded:.1f} MB", end='', flush=True)
+    
+    try:
+        urllib.request.urlretrieve(url, filename, show_progress)
+        print()  # New line after progress
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            raise Exception(f"File not found at URL: {url}")
+        elif e.code == 403:
+            raise Exception(f"Access denied to URL: {url}")
+        else:
+            raise Exception(f"HTTP error {e.code} downloading from: {url}")
+    except urllib.error.URLError as e:
+        raise Exception(f"Network error downloading from {url}: {e.reason}")
+
+def download_machine_token_utility() -> str:
+    """Download machine token utility from GitHub releases"""
     platform_name, executable_name = get_platform_info()
     
     print(f"🔍 Detected platform: {platform_name}")
-    print(f"📦 Extracting machine token utility for {platform_name}...")
+    print(f"🔍 Executable name: {executable_name}")
+    
+    # Check if already downloaded in current directory
+    executable_path = os.path.join('.', executable_name)
+    if os.path.exists(executable_path):
+        print(f"✅ Machine token utility already exists: {executable_path}")
+        # Verify it's executable on Unix systems
+        if platform.system() != "Windows":
+            os.chmod(executable_path, 0o755)
+        return executable_path
+    
+    # Check network connectivity
+    print("🔍 Checking network connectivity...")
+    if not check_network_connectivity():
+        raise Exception("No network connectivity. Cannot download machine token utility.\n"
+                       "Please check your internet connection and try again.")
+    
+    # GitHub release URL
+    zip_filename = f"{platform_name}.zip"
+    download_url = f"https://github.com/HexaEightTeam/Machine-Token-Utility/releases/download/prod/{zip_filename}"
+    
+    print(f"📦 Downloading machine token utility for {platform_name}...")
+    print(f"🔗 URL: {download_url}")
+    
+    temp_zip = f"temp_{zip_filename}"
     
     try:
-        # FIXED: Use modern importlib.resources instead of pkg_resources
-        zip_filename = f"{platform_name}.zip"
+        # Download the zip file
+        download_file_with_progress(download_url, temp_zip)
         
-        # Get the zip file from package resources using modern API
-        import hexaeight_mcp_client
-        with resources.files(hexaeight_mcp_client).joinpath(f'bin/{zip_filename}').open('rb') as zip_file:
-            zip_data = zip_file.read()
+        # Verify the download
+        if not os.path.exists(temp_zip):
+            raise Exception("Download completed but file not found")
         
-        # Write zip to temp file and extract
-        temp_zip = f"temp_{zip_filename}"
-        with open(temp_zip, 'wb') as f:
-            f.write(zip_data)
+        file_size = os.path.getsize(temp_zip)
+        print(f"✅ Downloaded {file_size / (1024 * 1024):.1f} MB")
         
         # Extract to current directory
+        print(f"📦 Extracting {zip_filename}...")
         with zipfile.ZipFile(temp_zip, 'r') as zip_ref:
+            # List contents first for debugging
+            file_list = zip_ref.namelist()
+            print(f"🔍 Archive contents: {file_list}")
+            
             zip_ref.extractall('.')
         
         # Clean up temp zip
         os.remove(temp_zip)
+        print(f"🗑️  Removed temporary file: {temp_zip}")
         
-        # Move files from subdirectory to current directory
+        # Handle extracted files - they might be in a subdirectory
         extracted_dir = os.path.join('.', platform_name)
         if os.path.exists(extracted_dir):
             print(f"📁 Moving files from {extracted_dir}/ to current directory...")
@@ -77,6 +144,7 @@ def extract_machine_token_utility() -> str:
                 # Remove destination if it exists
                 if os.path.exists(dest_path):
                     os.remove(dest_path)
+                    print(f"🔄 Overwriting existing: {filename}")
                 
                 # Move file
                 shutil.move(source_path, dest_path)
@@ -86,16 +154,70 @@ def extract_machine_token_utility() -> str:
             os.rmdir(extracted_dir)
             print(f"🗑️  Removed empty directory: {extracted_dir}")
         
+        # Verify the executable exists
+        if not os.path.exists(executable_path):
+            # Maybe the executable was extracted directly
+            print(f"🔍 Looking for executable in current directory...")
+            current_files = os.listdir('.')
+            print(f"🔍 Current directory files: {current_files}")
+            
+            # Try to find the executable with a different name
+            possible_names = [
+                executable_name,
+                "HexaEight-Machine-Tokens-Utility",
+                "HexaEight-Machine-Tokens-Utility.exe",
+                "machine-token-utility",
+                "machine-token-utility.exe"
+            ]
+            
+            found_executable = None
+            for possible_name in possible_names:
+                if os.path.exists(possible_name):
+                    found_executable = possible_name
+                    break
+            
+            if found_executable:
+                if found_executable != executable_name:
+                    # Rename to expected name
+                    os.rename(found_executable, executable_name)
+                    print(f"📄 Renamed {found_executable} to {executable_name}")
+                executable_path = os.path.join('.', executable_name)
+            else:
+                raise Exception(f"Executable not found after extraction. Expected: {executable_name}")
+        
         # Make executable on Unix systems
-        executable_path = os.path.join('.', executable_name)
         if os.path.exists(executable_path) and platform.system() != "Windows":
             os.chmod(executable_path, 0o755)
+            print(f"🔧 Made executable: {executable_path}")
         
-        print(f"✅ Machine token utility extracted: {executable_path}")
+        # Final verification
+        if not os.path.exists(executable_path):
+            raise Exception(f"Failed to create executable: {executable_path}")
+        
+        print(f"✅ Machine token utility ready: {executable_path}")
         return executable_path
         
     except Exception as e:
-        raise Exception(f"Failed to extract machine token utility: {e}")
+        # Cleanup on error
+        if os.path.exists(temp_zip):
+            try:
+                os.remove(temp_zip)
+            except:
+                pass
+        
+        # More helpful error messages
+        error_msg = str(e)
+        if "not found at URL" in error_msg:
+            error_msg += f"\n💡 Available platforms: win-x64, osx-64, linux-64, arm-x64"
+            error_msg += f"\n💡 Your platform detected as: {platform_name}"
+            error_msg += f"\n💡 If this seems wrong, please report this issue"
+        
+        raise Exception(f"Failed to download machine token utility: {error_msg}")
+
+# Keep the old function name for backward compatibility
+def extract_machine_token_utility() -> str:
+    """Backward compatibility wrapper - now downloads instead of extracting"""
+    return download_machine_token_utility()
 
 def run_command(command: List[str], check: bool = True) -> subprocess.CompletedProcess:
     """Run a command and return the result"""

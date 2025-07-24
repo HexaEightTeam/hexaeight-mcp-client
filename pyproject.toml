@@ -68,6 +68,5 @@ include = ["hexaeight_mcp_client*"]
 [tool.setuptools.package-data]
 hexaeight_mcp_client = [
     "py.typed",
-    "bin/*.zip",
     "templates/**/*"
 ]
