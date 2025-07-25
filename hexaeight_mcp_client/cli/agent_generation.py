@@ -121,10 +121,10 @@ class AgentGenerationCLI:
                         os.remove(dest)
                         print(f"🔄 Overwriting existing {filename}")
                     
-                    with open(source, 'r') as src_file:
+                    with open(source, 'r', encoding='utf-8') as src_file:
                         content = src_file.read()
                     
-                    with open(dest, 'w') as dst_file:
+                    with open(dest, 'w',encoding='utf-8') as dst_file:
                         dst_file.write(content)
                     
                     script_files.append(filename)

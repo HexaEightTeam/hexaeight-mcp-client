@@ -86,7 +86,7 @@ class SampleDeploymentCLI:
         for dest_file, template_path in agent_files.items():
             try:
                 content = get_template_content(template_path)
-                with open(dest_file, 'w') as f:
+                with open(dest_file, 'w', encoding='utf-8') as f:
                     f.write(content)
                 print(f"✅ Created: {dest_file}")
             except Exception as e:
@@ -166,7 +166,7 @@ echo "   Weather API: ✅ Configured"
 echo "   Azure OpenAI: ✅ Configured"
 '''
         
-        with open("setup_environment.sh", 'w') as f:
+        with open("setup_environment.sh", 'w', encoding='utf-8') as f:
             f.write(setup_script_content)
         
         # Make executable
@@ -204,7 +204,7 @@ AZURE_OPENAI_MODEL="gpt-4o-mini"
 # OPENAI_MODEL="gpt-4o-mini"
 '''
         
-        with open(".env.sample", 'w') as f:
+        with open(".env.sample", 'w', encoding='utf-8') as f:
             f.write(env_sample_content)
         print(f"✅ Created: .env.sample")
     
