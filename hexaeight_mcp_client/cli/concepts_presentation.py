@@ -272,7 +272,7 @@ License Installation for Agent Development
    Note: Licences are based on number of CPUs
    1 CPU: $15 (Minimum 5 daysi License)
 
-   If you plan to run Parent Agents permnently you need to purchase monthly licenses
+   If you plan to run Parent Agents permnantly you need to purchase monthly licenses
 
 ⚡ Activation:
    hexaeight-start license-activation
@@ -433,6 +433,36 @@ tool_agent = await quick_tool_agent(
 • Built-in message encryption
 • Agent coordination primitives
 • No manual security implementation needed
+"""),
+            
+            ("Portable Child Agent Environment", """
+Deploy Child Agents Anywhere Without License
+
+🌍 Portable Deployment Concept:
+Once you have a child agent configuration file and password,
+you can deploy it on ANY machine globally without needing
+the original license or parent agent infrastructure.
+
+📋 Prerequisites for Portable Setup:
+• Child agent configuration file (child_config.json)
+• 32+ character password used during child agent creation
+• hexaeight-mcp-client Python package installed
+• Environment variables (ClientID, PubSub URL, Token Server)
+
+🚀 Deployment Command:
+   hexaeight-start setup-portable-child-agent-environment child_config.json
+
+✅ What This Enables:
+• Cloud deployment (AWS, Azure, GCP, DigitalOcean)
+• Edge computing (Raspberry Pi, IoT devices)
+• Container deployment (Docker, Kubernetes)
+• Distributed agent networks across global infrastructure
+
+🔑 Key Benefits:
+• No license file needed on deployment machine
+• Child agents work forever (even after parent license expires)
+• Complete independence from parent infrastructure
+• Secure communication maintained via configuration file
 """)
         ]
 
