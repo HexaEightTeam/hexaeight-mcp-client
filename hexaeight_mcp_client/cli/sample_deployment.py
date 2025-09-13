@@ -351,6 +351,6 @@ export HEXAEIGHT_DEBUG=true
 - [WeatherAPI Documentation](https://www.weatherapi.com/docs/)
 '''
         
-        with open("README.md", 'w') as f:
+        with open("README.md", 'w',encoding='utf-8') as f:
             f.write(readme_content)
         print(f"✅ Created: README.md")
