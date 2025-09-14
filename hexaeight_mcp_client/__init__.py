@@ -68,6 +68,14 @@ from .exceptions import (
     TaskCoordinationError
 )
 
+# Git MCP Tool exports
+from .git_mcp_tool import (
+    GitMCPTool,
+    GitFileOperation,
+    GitCommitResult,
+    GitRepositoryState
+)
+
 # UPDATED: CLI tools exports - unified under hexaeight-start only
 from .cli.main import (
     hexaeight_start,
@@ -120,6 +128,12 @@ __all__ = [
     "quick_tool_agent",
     "quick_user_agent",
     
+    # Git MCP Tool
+    "GitMCPTool",
+    "GitFileOperation",
+    "GitCommitResult",
+    "GitRepositoryState",
+
     # UPDATED: CLI tools - unified interface only
     "hexaeight_start",
     "print_unified_cli_help",
@@ -192,7 +206,8 @@ def print_package_info():
     print(f"  ✅ Broadcast message filtering")
     print(f"  ✅ Tool agent format detection")
     print(f"  ✅ Generic resource names (no domain required)")
-    
+    print(f"  ✅ Git MCP Tool with 11+ operations (create, commit, history, diff, etc.)")
+
     print(f"\nQuick Start:")
     print(f"  # AutoGen LLM Agent")
     print(f"  agent = await quick_autogen_llm('parent_config.json')")
@@ -202,6 +217,10 @@ def print_package_info():
     print(f"  ")
     print(f"  # User Agent")
     print(f"  user = await quick_user_agent('user_config.json')")
+    print(f"  ")
+    print(f"  # Git MCP Tool")
+    print(f"  git_tool = GitMCPTool(agent_instance)")
+    print(f"  await git_tool.create_repository('my-repo')")
 
 # UPDATED: CLI information functions for unified structure only
 def get_cli_commands():
@@ -245,9 +264,11 @@ def print_cli_help():
     print(f"  • Instant AI agent identities: storm23-cloud-wave-bright09")
     print(f"  • Unlimited child agents with temporary license")
     print(f"  • Child agents work forever, even after license expires")
-    
+    print(f"  • Git MCP Tool with comprehensive operations (see HEXAEIGHT_GIT_OPERATIONS_GUIDE.md)")
+
     print(f"\n🔗 Resources:")
     print(f"  📖 Documentation: https://github.com/HexaEightTeam/hexaeight-mcp-client")
+    print(f"  📄 Git Operations: hexaeight_mcp_client/docs/HEXAEIGHT_GIT_OPERATIONS_GUIDE.md")
     print(f"  🛒 License Store: https://store.hexaeight.com")
     print(f"  📱 Mobile App: Search 'HexaEight Authenticator'")
     print(f"\n💡 Only 'hexaeight-start' command is available - clean, unified interface!")

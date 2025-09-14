@@ -27,6 +27,7 @@ classifiers = [
 ]
 dependencies = [
     "hexaeight-agent>=1.6.808",
+    "aiohttp>=3.8.0",
 ]
 
 [project.optional-dependencies]
@@ -65,5 +66,6 @@ include = ["hexaeight_mcp_client*"]
 hexaeight_mcp_client = [
     "py.typed",
     "templates/**/*",
-    "templates/license_activation_guide.md"
+    "templates/license_activation_guide.md",
+    "docs/**/*"
 ]

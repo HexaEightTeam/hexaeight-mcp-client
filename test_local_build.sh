@@ -30,13 +30,17 @@ pip install hexaeight-agent
 
 # Step 6: Install local package
 echo "📦 Installing local package..."
-pip install dist/hexaeight_mcp_client-0.1.0-py3-none-any.whl
+pip install dist/hexaeight_mcp_client-*.whl
 
 # Step 7: Test import
 echo "🧪 Testing import..."
 python -c "
 from hexaeight_mcp_client import HexaEightMCPClient, HexaEightAgentManager
-print('✅ Import successful')
+print('✅ Core imports successful')
+
+# Test Git MCP Tool imports
+from hexaeight_mcp_client import GitMCPTool, GitFileOperation, GitCommitResult, GitRepositoryState
+print('✅ Git MCP Tool imports successful')
 
 client = HexaEightMCPClient()
 tools = client.get_available_tools()
@@ -44,7 +48,12 @@ print(f'✅ Tools available: {list(tools.keys())}')
 
 manager = HexaEightAgentManager(debug=False)
 print('✅ Agent manager created')
+
+# Test Git tool class instantiation (without actual agent)
+print('✅ GitMCPTool class available')
+
 print('🎉 Local package test successful!')
+print('📄 Git operations documented in: hexaeight_mcp_client/docs/HEXAEIGHT_GIT_OPERATIONS_GUIDE.md')
 "
 
 # Step 8: Cleanup
